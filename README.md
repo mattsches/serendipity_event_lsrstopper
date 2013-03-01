@@ -17,7 +17,8 @@ Mit diesem Plugin werden Links zu Internetseiten und Medien, deren Verlage/Firme
 
 ## Installation
 
-1. [ZIP-Archiv](https://github.com/mattsches/serendipity_event_lsrstopper/archive/master.zip) herunterladen
-2. ZIP-Archiv entpacken
-3. Dateien nach `/plugins/` hochladen
-4. Das Plugin im Admin-Bereich von Serendipity aktivieren
+1. [ZIP-Archiv](https://github.com/mattsches/serendipity_event_lsrstopper/archive/master.zip) herunterladen.
+2. ZIP-Archiv entpacken.
+3. Dateien nach `/plugins/` hochladen.
+4. Das Plugin im Admin-Bereich von Serendipity aktivieren.
+5. Falls ihr das Plugin `serendipity_event_trackexits` verwendet, stellt sicher, dass es erst *nach* `serendipity_event_lsrstopper` ausgeführt wird!
