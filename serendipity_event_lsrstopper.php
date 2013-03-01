@@ -199,7 +199,7 @@ class serendipity_event_lsrstopper extends serendipity_event
      */
     protected function d64_lsr_check($list, $string)
     {
-        $blacklist = new \stdClass();
+        $blacklist = new stdClass();
         $blacklist->sites = array_filter(array_map('trim', explode(",", $list)));
         $blacklist->sites = array_filter(array_map('trim', $blacklist->sites));
     	if (!is_array($blacklist->sites) || count($blacklist->sites) == 0) {
