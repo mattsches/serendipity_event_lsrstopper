@@ -132,7 +132,7 @@ class serendipity_event_lsrstopper extends serendipity_event
     {
         $blacklist = $this->readCache();
         if ($blacklist === null) {
-            require_once (defined('S9Y_PEAR_PATH') ? S9Y_PEAR_PATH : S9Y_INCLUDE_PATH . 'bundled-libs/HTTP/Request.php');
+            require_once (defined('S9Y_PEAR_PATH') ? S9Y_PEAR_PATH : S9Y_INCLUDE_PATH . 'bundled-libs/') . 'HTTP/Request.php';
             $req = new HTTP_Request(self::BLACKLIST_URL, array('allowRedirects' => true, 'maxRedirects' => 3));
             if (PEAR::isError($req->sendRequest()) || $req->getResponseCode() != '200') {
                 return null;
