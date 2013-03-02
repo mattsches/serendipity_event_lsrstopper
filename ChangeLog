@@ -1,0 +1,9 @@
+Version 0.2:
+
+    * Removed use of namespace for stdClass(), works now with PHP 5.2
+    * Added DNS service provided by wazong.de (http://dentaku.wazong.de/2013/03/01/lsrdnsbl/)
+
+------------------------------------------------------------------------
+Version 0.1:
+
+    * Initial version

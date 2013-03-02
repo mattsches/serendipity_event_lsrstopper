@@ -44,7 +44,7 @@ class serendipity_event_lsrstopper extends serendipity_event
         $propbag->add('description',   PLUGIN_EVENT_LSRSTOPPER_DESC);
         $propbag->add('stackable',     false);
         $propbag->add('author',        'Matthias Gutjahr');
-        $propbag->add('version',       '0.1');
+        $propbag->add('version',       '0.2');
         $propbag->add('requirements',  array(
             'serendipity' => '1.6',
             'smarty'      => '2.6.7',
@@ -63,7 +63,9 @@ class serendipity_event_lsrstopper extends serendipity_event
               'element'  => 'extended',
             ),
         );
-        $confArray = array();
+        $confArray = array(
+            'use_blacklist',
+        );
         foreach($this->markupElements as $element) {
             $confArray[] = $element['name'];
         }
@@ -86,10 +88,20 @@ class serendipity_event_lsrstopper extends serendipity_event
      */
     public function introspect_config_item($name, &$propbag)
     {
-        $propbag->add('type',        'boolean');
-        $propbag->add('name',        constant($name));
-        $propbag->add('description', sprintf(APPLY_MARKUP_TO, constant($name)));
-        $propbag->add('default',     'true');
+        switch ($name) {
+            case 'use_blacklist':
+                $propbag->add('type',        'boolean');
+                $propbag->add('name',        PLUGIN_EVENT_LSRSTOPPER_USE_BLACKLIST_NAME);
+                $propbag->add('description', PLUGIN_EVENT_LSRSTOPPER_USE_BLACKLIST_DESC);
+                $propbag->add('default',     'true');
+                break;
+            default:
+                $propbag->add('type',        'boolean');
+                $propbag->add('name',        constant($name));
+                $propbag->add('description', sprintf(APPLY_MARKUP_TO, constant($name)));
+                $propbag->add('default',     'true');
+                break;
+        }
         return true;
     }
 
@@ -112,7 +124,11 @@ class serendipity_event_lsrstopper extends serendipity_event
                     $blacklist = $this->getBlacklist();
                     foreach ($this->markupElements as $temp) {
                         $element = $temp['element'];
-                        $eventData[$element] = $this->d64_lsr_check($blacklist, $eventData[$element]);
+                        if ($blacklist === null) {
+                            $eventData[$element] = $this->getDnsBlacklisted($eventData[$element]);
+                        } else {
+                            $eventData[$element] = $this->d64_lsr_check($blacklist, $eventData[$element]);
+                        }
                     }
                     return true;
                     break;
@@ -130,6 +146,9 @@ class serendipity_event_lsrstopper extends serendipity_event
      */
     protected function getBlacklist()
     {
+        if ($this->get_config('use_blacklist') == false) {
+            return null;
+        }
         $blacklist = $this->readCache();
         if ($blacklist === null) {
             require_once (defined('S9Y_PEAR_PATH') ? S9Y_PEAR_PATH : S9Y_INCLUDE_PATH . 'bundled-libs/') . 'HTTP/Request.php';
@@ -141,6 +160,32 @@ class serendipity_event_lsrstopper extends serendipity_event
             $this->writeCache($blacklist);
         }
         return $blacklist;
+    }
+
+    /**
+     * Check if blacklisted via DNS, see http://dentaku.wazong.de/2013/03/01/lsrdnsbl/
+     *
+     * @param string $string
+     * @return mixed
+     */
+    protected function getDnsBlacklisted($string)
+    {
+        $dom = str_get_html($string);
+        foreach ($dom->find('a') as $element) {
+            if (filter_var($element->href, FILTER_VALIDATE_URL) == false || substr($element->href, 0, 4) != 'http') {
+                continue;
+            }
+            $parts = parse_url($element->href);
+            $domain = $parts['host'];
+            if (preg_match('/(?P<domain>[a-z0-9][a-z0-9\-]{1,63}\.[a-z\.]{2,6})$/i', $domain, $matches)) {
+                $domain = $matches['domain'];
+            }
+            $ip = gethostbyname(strtolower($domain) . '.lsrbl.wazong.de');
+            if (substr($ip, -1) == '2') {
+                $element->href = self::PREPEND_URL . base64_encode($element->href);
+            }
+        }
+        return $dom->save();
     }
 
     /**
