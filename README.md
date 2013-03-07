@@ -1,10 +1,16 @@
-# D64 LSR-Stopper-Plugin für Serendipity
+# *Achtung*: Dieses Plugin ist nun Teil des offiziellen Plugin-Repositories von Serendipity! Ihr könnt es ab sofort ganz normal über SPARTACUS installieren.
+
+Ich werde daher dieses Repository nicht weiter pflegen und ggf. nach einiger Zeit löschen.
+
+----
+
+## D64 LSR-Stopper-Plugin für Serendipity
 
 Mit diesem Plugin verhinderst du Verlinkungen zu Medien, deren Verlage das Leistungsschutzrecht unterstützen bzw. in Anspruch nehmen.
 
 Dieses Plugin basiert auf dem [Original-Plugin für Wordpress](http://wordpress.org/extend/plugins/d64-lsr-stopper/). Danke!
 
-## Beschreibung
+### Beschreibung
 
 Mit diesem Plugin werden Links zu Internetseiten und Medien, deren Verlage/Firmen das Leistungsschutzrecht unterstützen bzw. in Anspruch nehmen, auf eine <a href="http://leistungsschutzrecht-stoppen.d-64.org/blacklisted/">spezielle Seite</a> umgeleitet, die über das Leistungsschutzrecht aufklärt. Auf der Blacklist sind die Mitglieder des BDZV (Bundesvereinigung deutscher Zeitungsverleger), des VDZ (Verband deutscher Zeitschriftenverleger) sowie der Deutschen Content-Allianz. Medien, die sich explizit vom Leistungsschutzrecht distanziert haben werden wieder entfernt.
 
@@ -18,7 +24,7 @@ Die Blacklist wird von D64 angeboten und dort heruntergeladen. Alternativ geschi
 
 <em>Hinweis: Keine Sorge, das Plugin lässt sich problemlos und rückstandslos entfernen (d.h. es werden keine Änderungen an der Datenbank vorgenommen), nach Deinstallation funktionieren alle Links wie vorher.</em>
 
-## Installation
+### Installation
 
 1. [ZIP-Archiv](https://github.com/mattsches/serendipity_event_lsrstopper/archive/master.zip) herunterladen.
 2. ZIP-Archiv entpacken.
