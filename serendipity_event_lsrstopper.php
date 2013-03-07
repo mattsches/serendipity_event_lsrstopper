@@ -12,11 +12,6 @@ class serendipity_event_lsrstopper extends serendipity_event
     /**
      * @const string
      */
-    const BLACKLIST_URL = 'http://leistungsschutzrecht-stoppen.d-64.org/blacklist.txt';
-
-    /**
-     * @const string
-     */
     const PREPEND_URL = 'http://leistungsschutzrecht-stoppen.d-64.org/blacklisted/?url=';
 
     /**
@@ -44,7 +39,7 @@ class serendipity_event_lsrstopper extends serendipity_event
         $propbag->add('description',   PLUGIN_EVENT_LSRSTOPPER_DESC);
         $propbag->add('stackable',     false);
         $propbag->add('author',        'Matthias Gutjahr');
-        $propbag->add('version',       '0.2');
+        $propbag->add('version',       '0.3');
         $propbag->add('requirements',  array(
             'serendipity' => '1.6',
             'smarty'      => '2.6.7',
@@ -65,6 +60,7 @@ class serendipity_event_lsrstopper extends serendipity_event
         );
         $confArray = array(
             'use_blacklist',
+            'blacklist_url',
         );
         foreach($this->markupElements as $element) {
             $confArray[] = $element['name'];
@@ -94,6 +90,12 @@ class serendipity_event_lsrstopper extends serendipity_event
                 $propbag->add('name',        PLUGIN_EVENT_LSRSTOPPER_USE_BLACKLIST_NAME);
                 $propbag->add('description', PLUGIN_EVENT_LSRSTOPPER_USE_BLACKLIST_DESC);
                 $propbag->add('default',     'true');
+                break;
+            case 'blacklist_url':
+                $propbag->add('type',        'hidden');
+                $propbag->add('name',        'blacklist_url');
+                $propbag->add('description', 'blacklist_url');
+                $propbag->add('default',     'http://leistungsschutzrecht-stoppen.d-64.org/blacklist.txt');
                 break;
             default:
                 $propbag->add('type',        'boolean');
@@ -149,10 +151,15 @@ class serendipity_event_lsrstopper extends serendipity_event
         if ($this->get_config('use_blacklist') == false) {
             return null;
         }
+        if (!$this->isUrl($this->get_config('blacklist_url')) && file_exists($this->get_config('blacklist_url'))) {
+            // local file
+            $blacklist = file_get_contents($this->get_config('blacklist_url'));
+            return $blacklist;
+        }
         $blacklist = $this->readCache();
         if ($blacklist === null) {
             require_once (defined('S9Y_PEAR_PATH') ? S9Y_PEAR_PATH : S9Y_INCLUDE_PATH . 'bundled-libs/') . 'HTTP/Request.php';
-            $req = new HTTP_Request(self::BLACKLIST_URL, array('allowRedirects' => true, 'maxRedirects' => 3));
+            $req = new HTTP_Request($this->get_config('blacklist_url'), array('allowRedirects' => true, 'maxRedirects' => 3));
             if (PEAR::isError($req->sendRequest()) || $req->getResponseCode() != '200') {
                 return null;
             }
@@ -195,7 +202,7 @@ class serendipity_event_lsrstopper extends serendipity_event
      */
     protected function readCache()
     {
-        $filename = $this->getCacheFilename(self::BLACKLIST_URL);
+        $filename = $this->getCacheFilename($this->get_config('blacklist_url'));
         if (file_exists($filename) && (time() - filemtime($filename)) < self::CACHE_TTL) {
             $fp = fopen($filename, 'rb');
             $result = fread($fp, filesize($filename));
@@ -212,7 +219,7 @@ class serendipity_event_lsrstopper extends serendipity_event
      */
     protected function writeCache($blacklist)
     {
-        $filename = $this->getCacheFilename(self::BLACKLIST_URL);
+        $filename = $this->getCacheFilename($this->get_config('blacklist_url'));
         $cache_dir = dirname($filename);
         if (!is_dir($cache_dir)) {
             mkdir($cache_dir);
@@ -262,5 +269,16 @@ class serendipity_event_lsrstopper extends serendipity_event
             }
         }
     	return $dom->save();
+    }
+
+    /**
+     * Test if a string is a valid URL
+     *
+     * @param string $url
+     * @return boolean
+     */
+    protected function isUrl($url)
+    {
+    	return filter_var($url, FILTER_VALIDATE_URL);
     }
 }

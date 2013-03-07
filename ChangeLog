@@ -1,3 +1,9 @@
+Version 0.3:
+
+    * Added simple unit test (with support for local blacklist files)
+    * Added documentation (de)
+
+------------------------------------------------------------------------
 Version 0.2:
 
     * Removed use of namespace for stdClass(), works now with PHP 5.2
